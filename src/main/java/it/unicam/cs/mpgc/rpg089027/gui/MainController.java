@@ -1,10 +1,13 @@
 package it.unicam.cs.mpgc.rpg089027.gui;
 
+import it.unicam.cs.mpgc.rpg089027.modelli.Combattente;
 import it.unicam.cs.mpgc.rpg089027.modelli.Eroe;
 import it.unicam.cs.mpgc.rpg089027.modelli.Guerriero;
 import it.unicam.cs.mpgc.rpg089027.modelli.Mago;
+import it.unicam.cs.mpgc.rpg089027.modelli.Mostro;
 import it.unicam.cs.mpgc.rpg089027.modelli.Squadra;
 import it.unicam.cs.mpgc.rpg089027.persistenza.GestoreSalvataggiJson;
+import it.unicam.cs.mpgc.rpg089027.servizi.GestoreCombattimento;
 import it.unicam.cs.mpgc.rpg089027.servizi.Partita;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -21,11 +24,13 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Controller principale per l'interfaccia grafica JavaFX (MainView.fxml).
- * Gestisce la visualizzazione della squadra, l'aggiornamento reattivo della tabella
- * e l'invocazione delle operazioni coordinate dal Facade Partita.
+ * Gestisce la visualizzazione della squadra, l'aggiornamento reattivo della tabella,
+ * l'arruolamento dei personaggi e l'arena di combattimento a turni con log in tempo reale.
  */
 public class MainController {
 
@@ -49,7 +54,13 @@ public class MainController {
     @FXML private Label lblBarraStato;
 
     private Partita partita;
+    private GestoreCombattimento combattimentoAttivo;
+    private Combattente nemicoAttuale;
+    private int hpInizialiNemico;
+    private int indiceUltimoLogLetto = 0;
+
     private final ObservableList<Eroe> listaEroiOsservabile = FXCollections.observableArrayList();
+    private final Random random = new Random();
 
     @FXML
     public void initialize() {
@@ -189,6 +200,111 @@ public class MainController {
     }
 
     @FXML
+    private void handleGeneraNemico(ActionEvent event) {
+        if (!partita.getSquadra().isAlmenoUnoVivo()) {
+            mostraAvviso("Squadra Esausta", "Tutti gli eroi sono esausti. Rianimali o crea una nuova squadra.");
+            return;
+        }
+
+        String[] nomiMostri = {"Orco delle Montagne", "Drago Antico", "Goblin Sciamano", "Golem di Pietra"};
+        String nomeScelto = nomiMostri[random.nextInt(nomiMostri.length)];
+        hpInizialiNemico = 70 + random.nextInt(50);
+        int potenzaAttacco = 12 + random.nextInt(8);
+
+        nemicoAttuale = new Mostro(nomeScelto, hpInizialiNemico, potenzaAttacco);
+        combattimentoAttivo = partita.iniziaCombattimento(nemicoAttuale);
+        indiceUltimoLogLetto = 0;
+
+        lblNomeNemico.setText(nemicoAttuale.getNome());
+        aggiornaBarraNemico();
+
+        btnAttacca.setDisable(false);
+        btnAbilitaSpeciale.setDisable(false);
+        btnRisolviScontro.setDisable(false);
+
+        sincronizzaBattleLog();
+        impostaMessaggioStato("Scontro avviato contro: " + nemicoAttuale.getNome());
+    }
+
+    @FXML
+    private void handleAttacca(ActionEvent event) {
+        eseguiTurnoCombattimento();
+    }
+
+    @FXML
+    private void handleAbilitaSpeciale(ActionEvent event) {
+        eseguiTurnoCombattimento();
+    }
+
+    private void eseguiTurnoCombattimento() {
+        if (combattimentoAttivo == null || combattimentoAttivo.isCombattimentoTerminato()) {
+            return;
+        }
+
+        combattimentoAttivo.eseguiTurno();
+
+        aggiornaBarraNemico();
+        aggiornaVistaSquadra();
+        sincronizzaBattleLog();
+
+        if (combattimentoAttivo.isCombattimentoTerminato()) {
+            gestisciFineCombattimento();
+        }
+    }
+
+    @FXML
+    private void handleRisolviScontro(ActionEvent event) {
+        if (combattimentoAttivo == null || combattimentoAttivo.isCombattimentoTerminato()) {
+            return;
+        }
+
+        partita.concludiCombattimentoCorrente();
+
+        aggiornaBarraNemico();
+        aggiornaVistaSquadra();
+        sincronizzaBattleLog();
+        gestisciFineCombattimento();
+    }
+
+    private void gestisciFineCombattimento() {
+        disabilitaControlliScontro();
+        if (combattimentoAttivo.isVittoriaSquadra()) {
+            impostaMessaggioStato("Scontro vinto! Vittorie totali registrate: " + partita.getVittorieTotali());
+        } else {
+            impostaMessaggioStato("Sconfitta: tutti gli eroi della squadra sono caduti.");
+        }
+    }
+
+    private void sincronizzaBattleLog() {
+        if (combattimentoAttivo == null) {
+            return;
+        }
+        List<String> logCompleto = combattimentoAttivo.getRegistroBattaglia();
+        while (indiceUltimoLogLetto < logCompleto.size()) {
+            txtBattleLog.appendText(logCompleto.get(indiceUltimoLogLetto) + "\n");
+            indiceUltimoLogLetto++;
+        }
+    }
+
+    private void aggiornaBarraNemico() {
+        if (nemicoAttuale != null && hpInizialiNemico > 0) {
+            int hp = Math.max(0, nemicoAttuale.getPuntiVita());
+            double ratio = (double) hp / hpInizialiNemico;
+            barSaluteNemico.setProgress(ratio);
+            lblHpNemico.setText(hp + " / " + hpInizialiNemico);
+        } else {
+            barSaluteNemico.setProgress(0.0);
+            lblHpNemico.setText("0 / 0");
+        }
+    }
+
+    private void disabilitaControlliScontro() {
+        btnAttacca.setDisable(true);
+        btnAbilitaSpeciale.setDisable(true);
+        btnRisolviScontro.setDisable(true);
+    }
+
+    @FXML
     private void handleEsci(ActionEvent event) {
         System.exit(0);
     }
@@ -202,12 +318,6 @@ public class MainController {
                 "Architettura: JavaFX (MVC), JUnit 5, Gson e Principi SOLID.");
         alert.showAndWait();
     }
-
-    // Metodi per la gestione della battaglia (che collegheremo nel Commit 28)
-    @FXML private void handleGeneraNemico(ActionEvent event) {}
-    @FXML private void handleAttacca(ActionEvent event) {}
-    @FXML private void handleAbilitaSpeciale(ActionEvent event) {}
-    @FXML private void handleRisolviScontro(ActionEvent event) {}
 
     public void mostraErrore(String titolo, String messaggio) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
