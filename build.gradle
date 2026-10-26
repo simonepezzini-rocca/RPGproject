@@ -1,28 +1,44 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 group = 'it.unicam.cs.mpgc.rpg089027'
-version = '1.0-SNAPSHOT'
+version = '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+//java {
+ //   toolchain {
+  //      languageVersion = JavaLanguageVersion.of(21)
+ //   }
+//}
+
+javafx {
+    version = '21.0.2'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+application {
+    mainClass = 'it.unicam.cs.mpgc.rpg089027.App'
 }
 
 dependencies {
-    // Libreria Gson per la persistenza JSON
+    // Google Gson per la persistenza JSON
     implementation 'com.google.code.gson:gson:2.10.1'
 
-    // Testing framework JUnit 5
-    testImplementation platform('org.junit:junit-bom:5.10.0')
+    // Testing di Unità con JUnit 5
+    testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
