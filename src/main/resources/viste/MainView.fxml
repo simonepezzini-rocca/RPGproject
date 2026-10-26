@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="it.unicam.cs.mpgc.rpg089027.gui.MainController"
+            prefHeight="650.0" prefWidth="950.0">
+
+    <!-- BARRA DEI MENU SUPERIORE -->
+    <top>
+        <MenuBar>
+            <Menu text="File">
+                <MenuItem text="Nuova Squadra" onAction="#handleNuovaSquadra"/>
+                <MenuItem text="Carica Squadra (JSON)..." onAction="#handleCaricaSquadra"/>
+                <MenuItem text="Salva Squadra (JSON)..." onAction="#handleSalvaSquadra"/>
+                <SeparatorMenuItem/>
+                <MenuItem text="Esci" onAction="#handleEsci"/>
+            </Menu>
+            <Menu text="Aiuto">
+                <MenuItem text="Informazioni sul Progetto" onAction="#handleMostraInfo"/>
+            </Menu>
+        </MenuBar>
+    </top>
+
+    <!-- AREA CENTRALE SUDDIVISA IN DUE PANNELLI -->
+    <center>
+        <SplitPane dividerPositions="0.45">
+
+            <!-- PANNELLO SINISTRO: GESTIONE SQUADRA -->
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+
+                <Label text="Gestione Squadra Eroi" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label text="Nome Squadra:"/>
+                    <Label fx:id="lblNomeSquadra" text="Nessuna Squadra" style="-fx-font-weight: bold;"/>
+                </HBox>
+
+                <!-- TABELLA MEMBRI SQUADRA -->
+                <TableView fx:id="tabellaEroi" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNome" text="Nome" prefWidth="120.0"/>
+                        <TableColumn fx:id="colClasse" text="Classe" prefWidth="90.0"/>
+                        <TableColumn fx:id="colHp" text="Punti Vita" prefWidth="90.0"/>
+                        <TableColumn fx:id="colStato" text="Stato" prefWidth="80.0"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+
+                <!-- AZIONI SULLA SQUADRA -->
+                <HBox spacing="10.0" alignment="CENTER">
+                    <Button text="Arruola Nuovo Eroe..." onAction="#handleArruolaEroe" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    <Button text="Rimuovi Selezionato" onAction="#handleRimuoviEroe" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+
+            <!-- PANNELLO DESTRO: ARENA DI COMBATTIMENTO E LOG -->
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+
+                <Label text="Arena di Combattimento" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                <!-- SCHEDA DEL NEMICO -->
+                <TitledPane text="Avversario Attuale" collapsible="false">
+                    <VBox spacing="8.0">
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Nome Nemico:"/>
+                            <Label fx:id="lblNomeNemico" text="Nessun avversario" style="-fx-font-weight: bold;"/>
+                        </HBox>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Salute Nemico:"/>
+                            <ProgressBar fx:id="barSaluteNemico" progress="0.0" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblHpNemico" text="0 / 0"/>
+                        </HBox>
+                    </VBox>
+                </TitledPane>
+
+                <!-- CONTROLLI DI COMBATTIMENTO -->
+                <HBox spacing="10.0" alignment="CENTER">
+                    <Button fx:id="btnGeneraNemico" text="Genera Nuovo Mostro" onAction="#handleGeneraNemico" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnAttacca" text="Attacca" onAction="#handleAttacca" disable="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnAbilitaSpeciale" text="Abilità Speciale" onAction="#handleAbilitaSpeciale" disable="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnRisolviScontro" text="Risolvi Tutto" onAction="#handleRisolviScontro" disable="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <Label text="Registro Eventi Battaglia (Log):" style="-fx-font-weight: bold;"/>
+                <TextArea fx:id="txtBattleLog" editable="false" wrapText="true" VBox.vgrow="ALWAYS"
+                          promptText="Gli eventi dello scontro a turni verranno visualizzati qui..."/>
+            </VBox>
+
+        </SplitPane>
+    </center>
+
+    <!-- BARRA DI STATO INFERIORE -->
+    <bottom>
+        <HBox spacing="10.0" alignment="CENTER_LEFT" style="-fx-border-color: #cccccc; -fx-border-width: 1 0 0 0;">
+            <padding>
+                <Insets top="5.0" right="10.0" bottom="5.0" left="10.0"/>
+            </padding>
+            <Label fx:id="lblBarraStato" text="Applicazione pronta. Carica o crea una squadra per iniziare."/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
