@@ -11,8 +11,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -138,6 +143,35 @@ public class MainController {
     }
 
     @FXML
+    private void handleArruolaEroe(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/viste/NuovoEroeDialog.fxml"));
+            VBox dialogRoot = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Arruola Nuovo Eroe");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(tabellaEroi.getScene().getWindow());
+            dialogStage.setScene(new Scene(dialogRoot));
+
+            NuovoEroeController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+
+            dialogStage.showAndWait();
+
+            if (controller.isConfermato() && controller.getEroeCreato() != null) {
+                partita.getSquadra().aggiungiMembro(controller.getEroeCreato());
+                aggiornaVistaSquadra();
+                impostaMessaggioStato("Arruolato nuovo eroe: " + controller.getEroeCreato().getNome());
+            }
+        } catch (IOException e) {
+            mostraErrore("Errore Interfaccia", "Impossibile aprire il dialogo: " + e.getMessage());
+        } catch (Exception e) {
+            mostraErrore("Errore di Dominio", e.getMessage());
+        }
+    }
+
+    @FXML
     private void handleRimuoviEroe(ActionEvent event) {
         Eroe selezionato = tabellaEroi.getSelectionModel().getSelectedItem();
         if (selezionato == null) {
@@ -169,7 +203,7 @@ public class MainController {
         alert.showAndWait();
     }
 
-    @FXML private void handleArruolaEroe(ActionEvent event) {}
+    // Metodi per la gestione della battaglia (che collegheremo nel Commit 28)
     @FXML private void handleGeneraNemico(ActionEvent event) {}
     @FXML private void handleAttacca(ActionEvent event) {}
     @FXML private void handleAbilitaSpeciale(ActionEvent event) {}

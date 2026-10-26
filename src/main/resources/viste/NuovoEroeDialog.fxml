@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unicam.cs.mpgc.rpg089027.gui.NuovoEroeController"
+      spacing="12.0" prefWidth="380.0">
+
+    <padding>
+        <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
+    </padding>
+
+    <Label text="Arruola un Nuovo Eroe" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <Separator/>
+
+    <GridPane hgap="10.0" vgap="12.0">
+        <columnConstraints>
+            <ColumnConstraints minWidth="100.0" prefWidth="110.0"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <!-- NOME EROE -->
+        <Label text="Nome Eroe:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtNome" promptText="Es. Conan, Merlino..." GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <!-- CLASSE -->
+        <Label text="Classe Eroe:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cmbClasse" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <!-- ATTRIBUTO SPECIFICO DINAMICO -->
+        <Label fx:id="lblAttributo" text="Attributo:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Spinner fx:id="spnAttributo" maxWidth="Infinity" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Separator/>
+
+    <!-- PULSANTI CONFERMA / ANNULLA -->
+    <HBox spacing="10.0" alignment="CENTER_RIGHT">
+        <Button text="Annulla" onAction="#handleAnnulla" prefWidth="90.0"/>
+        <Button text="Arruola" onAction="#handleConferma" defaultButton="true" prefWidth="90.0"/>
+    </HBox>
+
+</VBox>
