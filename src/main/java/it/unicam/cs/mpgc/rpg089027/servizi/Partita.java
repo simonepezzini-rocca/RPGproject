@@ -80,6 +80,19 @@ public class Partita {
     }
 
     /**
+     * Salva lo stato attuale della squadra nel percorso specificato.
+     *
+     * @param percorso il file di destinazione su cui scrivere la squadra
+     * @throws IOException in caso di errori di scrittura su file
+     */
+    public void salvaSquadraSuFile(Path percorso) throws IOException {
+        if (percorso == null) {
+            throw new IllegalArgumentException("Il percorso di salvataggio non può essere nullo.");
+        }
+        gestoreSalvataggi.salvaSquadra(this.squadra, percorso);
+    }
+
+    /**
      * Esegue il salvataggio rapido dello stato attuale della squadra.
      *
      * @throws IOException in caso di errori di scrittura su file
@@ -88,7 +101,7 @@ public class Partita {
         Path percorso = ConfigurazioneSalvataggi.risolviPercorsoSalvataggio(
                 ConfigurazioneSalvataggi.NOME_SALVATAGGIO_RAPIDO
         );
-        gestoreSalvataggi.salvaSquadra(this.squadra, percorso);
+        salvaSquadraSuFile(percorso);
     }
 
     /**

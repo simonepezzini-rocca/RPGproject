@@ -10,15 +10,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Gestisce l'aggregazione di un gruppo di eroi che partecipano insieme all'avventura.
- * <p>
- * Fornisce operazioni per l'arruolamento, la rimozione e il monitoraggio
- * dello stato dei componenti, incapsulando la lista interna e impiegando
- * l'API Stream di Java per le interrogazioni.
+ * Rappresenta un gruppo organizzato di eroi.
+ * Gestisce l'incapsulamento dei membri, esponendo viste non modificabili
+ * e query dichiarative basate sulla Stream API.
  */
 public class Squadra {
 
-    private final String nomeSquadra;
+    private String nomeSquadra;
     private final List<Eroe> membri;
 
     /**
@@ -36,6 +34,18 @@ public class Squadra {
 
     public String getNomeSquadra() {
         return nomeSquadra;
+    }
+
+    /**
+     * Aggiorna il nome della squadra.
+     *
+     * @param nomeSquadra nuovo nome della squadra (non nullo e non vuoto)
+     */
+    public void setNomeSquadra(String nomeSquadra) {
+        if (nomeSquadra == null || nomeSquadra.trim().isEmpty()) {
+            throw new IllegalArgumentException("Il nome della squadra non può essere vuoto o nullo.");
+        }
+        this.nomeSquadra = nomeSquadra.trim();
     }
 
     /**
@@ -77,6 +87,18 @@ public class Squadra {
         if (!rimosso) {
             throw new MembroNonTrovatoException("Nessun membro trovato con ID: " + id);
         }
+    }
+
+    /**
+     * Rimuove un eroe dalla squadra dato l'oggetto eroe.
+     *
+     * @param eroe l'eroe da rimuovere
+     */
+    public void rimuoviMembro(Eroe eroe) {
+        if (eroe == null) {
+            throw new IllegalArgumentException("L'eroe non può essere nullo.");
+        }
+        rimuoviMembro(eroe.getId());
     }
 
     /**
