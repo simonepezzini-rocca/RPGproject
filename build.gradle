@@ -41,4 +41,12 @@ test {
     testLogging {
         events "PASSED", "SKIPPED", "FAILED"
     }
+
+javadoc {
+        options.encoding = 'UTF-8'
+        options.charSet = 'UTF-8'
+        options.author = true
+        options.version = true
+    }
+
 }
