@@ -41,3 +41,10 @@ bin/
 
 # Cartella salvataggi locali di gioco
 saves/
+
+# File di Sistema Operativo
+Thumbs.db
+
+# File temporanei e di log
+*.log
+*.tmp
